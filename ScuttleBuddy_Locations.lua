@@ -1,0 +1,2 @@
+ScuttleBuddy.locations = {
+}

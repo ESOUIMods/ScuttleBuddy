@@ -1,0 +1,27 @@
+## Title: ScuttleBuddy
+## Description: Adds Scuttlebloom locations to the map
+## Author: Sharlikran
+## Version: 1.00
+## AddOnVersion: 100
+## APIVersion: 100031
+## SavedVariables: ScuttleBuddy_SavedVars
+## DependsOn: CustomCompassPins>=31 LibMapPins-1.0>=10027 LibGPS>=37 Lib3D>=312 LibAddonMenu-2.0>=30
+## OptionalDependsOn: LibDebugLogger>=196 DebugLogViewer
+
+; DISCLAIMER:
+;
+; This Add-on is not created by, affiliated with or sponsored by ZeniMax
+; Media Inc. or its affiliates. The Elder Scrolls® and related logos are
+; registered trademarks or trademarks of ZeniMax Media Inc. in the United
+; States and/or other countries. All rights reserved.
+;
+; You can read the full terms at:
+; https://account.elderscrollsonline.com/add-on-terms
+
+Init.lua
+Language/ScuttleBuddy_Strings.lua
+Language/$(language).lua
+ScuttleBuddy_Locations.lua
+ScuttleBuddy.xml
+ScuttleBuddy_Settings.lua
+ScuttleBuddy.lua
