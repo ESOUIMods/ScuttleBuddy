@@ -3,15 +3,7 @@ local LMP = LibMapPins
 local LAM = LibAddonMenu2
 
 local pin_textures_list = {
-    [1] = "Pickaxe-Shovel Red-X (Default)",
-    [2] = "Pickaxe-Shovel",
-    [3] = "Question Mark",
-    [4] = "Glowing Crystal",
-    [5] = "Crystal",
-    [6] = "Facet",
-    [7] = "Tracking Icon",
-    [8] = "Eye",
-    [9] = "Holy Grail",
+    [1] = "Scuttle Bloom (Default)",
 }
 
 local panelData = {
@@ -67,6 +59,7 @@ local optionsTable = {
         default = pin_textures_list[ScuttleBuddy.ScuttleBuddy_defaults.pin_type],
     },
     -- 3D Digsite Icon Texture
+    --[[
     {
         type = "dropdown",
         name = GetString(digsite_texture_text),
@@ -78,13 +71,14 @@ local optionsTable = {
                     if name == selected then
                         ScuttleBuddy_SavedVars.digsite_pin_type = index
                         digsite_icon:SetTexture(ScuttleBuddy.pin_textures[index])
-                        ScuttleBuddy.Draw3DPins() -- this makes the pins appear when the are normally hidden
+                        --ScuttleBuddy.Draw3DPins() -- this makes the pins appear when the are normally hidden
                         break
                     end
                 end
             end,
         default = pin_textures_list[ScuttleBuddy.ScuttleBuddy_defaults.digsite_pin_type],
     },
+    ]]--
     -- Set Map Pin pin size
     {
         type = "slider",
@@ -136,6 +130,7 @@ local optionsTable = {
         default = ScuttleBuddy.ScuttleBuddy_defaults.compass_max_distance * 1000,
     },
     -- Set color for the 3D Map Pin Spike
+    --[[
     {
         type = "colorpicker",
         name = GetString(spike_pincolor),
@@ -143,10 +138,11 @@ local optionsTable = {
         getFunc = function() return unpack(ScuttleBuddy_SavedVars.digsite_spike_color) end,
         setFunc = function(r,g,b,a)
             ScuttleBuddy_SavedVars.digsite_spike_color = ScuttleBuddy.create_color_table(r, g, b, a)
-            ScuttleBuddy.Draw3DPins()
+            --ScuttleBuddy.Draw3DPins()
         end,
         default = ScuttleBuddy.ScuttleBuddy_defaults.digsite_spike_color,
     },
+    ]]--
 }
 
 local function OnPlayerActivated(event)

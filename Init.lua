@@ -13,11 +13,11 @@ ScuttleBuddy_defaults = {
 ScuttleBuddy_SavedVars.show_pins
 ]]--
 ScuttleBuddy.addon_name = "ScuttleBuddy"
-ScuttleBuddy.addon_version = "1.00"
+ScuttleBuddy.addon_version = "1.05"
 ScuttleBuddy.addon_website = "https://www.esoui.com/downloads/info2647-ScuttleBuddy.html"
-ScuttleBuddy.custom_compass_pin = "compass_digsite" -- custom compas pin pin type
+ScuttleBuddy.custom_compass_pin = "ScuttleBuddy_compass_pin" -- custom compas pin pin type
 ScuttleBuddy.ScuttleBuddy_map_pin = "ScuttleBuddy_map_pin"
-ScuttleBuddy.dig_site_pin = "dig_site_pin"
+ScuttleBuddy.dig_site_pin = "ScuttleBuddy_location_pin"
 ScuttleBuddy.client_lang = GetCVar("language.2")
 ScuttleBuddy.should_update_digsites = true
 

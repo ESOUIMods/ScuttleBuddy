@@ -12,7 +12,7 @@ if LibDebugLogger then
     local logger = LibDebugLogger.Create(ScuttleBuddy.addon_name)
     ScuttleBuddy.logger = logger
 end
-ScuttleBuddy.show_log = true
+ScuttleBuddy.show_log = false
 local SDLV = DebugLogViewer
 
 local function create_log(log_type, log_content)
@@ -85,14 +85,14 @@ ScuttleBuddy_SavedVars.dig_site_pin = ScuttleBuddy_SavedVars.dig_site_pin or Scu
 ScuttleBuddy_SavedVars.digsite_spike_color = ScuttleBuddy_SavedVars.digsite_spike_color or ScuttleBuddy.ScuttleBuddy_defaults.digsite_spike_color
 
 -- Existing Local
-local PIN_TYPE = "pinType_Digsite" -- This is changed by LAM now, use ScuttleBuddy.ScuttleBuddy_map_pin
-local PIN_FILTER_NAME = "ScuttleBuddy"
 local PIN_NAME = "Scuttle Bloom"
-local PIN_PRIORITY_OFFSET = 1
 
 -- ScuttleBuddy
 ScuttleBuddy.dig_site_names = {
     ["en"] = "Scuttle Bloom",
+    ["ru"] = "Скатловый цветок",
+    ["de"] = "Krabbelblüte",
+    ["fr"] = "fleur trotteuse",
 }
 
 ScuttleBuddy.loc_index = {
@@ -149,11 +149,10 @@ end
 ---------------------------------------
 ----- ScuttleBuddy                     -----
 ---------------------------------------
-ScuttleBuddy.worldControlPool = ZO_ControlPool:New("ScuttleBuddy_WorldPin", ScuttleBuddy_WorldPins)
-ScuttleBuddy.antiquity_locations = {}
+--ScuttleBuddy.worldControlPool = ZO_ControlPool:New("ScuttleBuddy_WorldPin", ScuttleBuddy_WorldPins)
 
 local function get_digsite_loc_sv(zone)
-    d(zone)
+    ScuttleBuddy.dm("Debug", zone)
     if is_empty_or_nil(ScuttleBuddy_SavedVars.location_info[zone]) then
         return {}
     else
@@ -226,21 +225,23 @@ end
 
 function ScuttleBuddy.RefreshPinLayout()
     LMP:SetLayoutKey(ScuttleBuddy.ScuttleBuddy_map_pin, "size", ScuttleBuddy_SavedVars.pin_size)
-    LMP:SetLayoutKey(ScuttleBuddy.ScuttleBuddy_map_pin, "level", ScuttleBuddy_SavedVars.pin_level+PIN_PRIORITY_OFFSET)
+    LMP:SetLayoutKey(ScuttleBuddy.ScuttleBuddy_map_pin, "level", ScuttleBuddy_SavedVars.pin_level)
     LMP:SetLayoutKey(ScuttleBuddy.ScuttleBuddy_map_pin, "texture", ScuttleBuddy.pin_textures[ScuttleBuddy_SavedVars.pin_type])
 end
 
 ---------------------------------------
 ----- Lib3D                       -----
 ---------------------------------------
-
+--[[
 function ScuttleBuddy.Hide3DPins()
     -- remove the on update handler and hide the ScuttleBuddy.dig_site_pin
     EVENT_MANAGER:UnregisterForUpdate("DigSite")
     ScuttleBuddy_WorldPins:SetHidden(true)
     ScuttleBuddy.worldControlPool:ReleaseAllObjects()
 end
+]]--
 
+--[[
 function ScuttleBuddy.Draw3DPins()
     EVENT_MANAGER:UnregisterForUpdate("DigSite")
 
@@ -296,6 +297,7 @@ function ScuttleBuddy.Draw3DPins()
         end)
     end
 end
+]]--
 
 local function OnInteract(event_code, client_interact_result, interact_target_name)
     ScuttleBuddy.dm("Debug", "OnInteract Occured")
@@ -328,16 +330,6 @@ function ScuttleBuddy.combine_data(zone)
 end
 
 function ScuttleBuddy.get_pin_data(zone)
-    local function digsite_in_range(location)
-        for key, compas_pin_loc in pairs(ScuttleBuddy.antiquity_locations) do
-            local distance = zo_round(GPS:GetLocalDistanceInMeters(compas_pin_loc.x, compas_pin_loc.y, location[ScuttleBuddy.loc_index.x_pos], location[ScuttleBuddy.loc_index.y_pos]))
-            if distance <= ScuttleBuddy.antiquity_locations[key].size then
-                return true
-            end
-        end
-        return false
-    end
-
     local function in_mod_digsite_pool(main_table, location)
         for _, compas_pin_loc in pairs(main_table) do
             local distance = zo_round(GPS:GetLocalDistanceInMeters(compas_pin_loc[ScuttleBuddy.loc_index.x_pos], compas_pin_loc[ScuttleBuddy.loc_index.y_pos], location[ScuttleBuddy.loc_index.x_pos], location[ScuttleBuddy.loc_index.y_pos]))
@@ -355,19 +347,6 @@ function ScuttleBuddy.get_pin_data(zone)
 
     -- this is the end result if within range
     local mod_digsite_pool = { }
-
-    for num_entry, digsite_loc in ipairs(ScuttleBuddy.locations[zone]) do
-        if digsite_in_range(digsite_loc) then
-            table.insert(mod_digsite_pool, digsite_loc)
-        end
-    end
-
-    local locations_sv_table = get_digsite_loc_sv(zone) or { }
-    for num_entry, digsite_loc in ipairs(locations_sv_table) do
-        if digsite_in_range(digsite_loc) and not in_mod_digsite_pool(mod_digsite_pool, digsite_loc) then
-            table.insert(mod_digsite_pool, digsite_loc)
-        end
-    end
 
     mod_digsite_pool = ScuttleBuddy.combine_data(zone)
     return mod_digsite_pool
@@ -446,6 +425,10 @@ local function InitializePins()
     }
 
     LMP:AddPinType(ScuttleBuddy.ScuttleBuddy_map_pin, function() PinTypeAddCallback(ScuttleBuddy.ScuttleBuddy_map_pin) end, nil, lmp_pin_layout, pinTooltipCreator)
+    LMP:AddPinFilter(ScuttleBuddy.ScuttleBuddy_map_pin, zo_iconFormat(ScuttleBuddy.pin_textures[1],24,24).." "..PIN_NAME, false, ScuttleBuddy_SavedVars, "ScuttleBuddy_map_pin")
+    LMP:SetPinFilterHidden(ScuttleBuddy.ScuttleBuddy_map_pin, "pvp", true)
+    LMP:SetPinFilterHidden(ScuttleBuddy.ScuttleBuddy_map_pin, "imperialPvP", true)
+    LMP:SetPinFilterHidden(ScuttleBuddy.ScuttleBuddy_map_pin, "battleground", true)
     ScuttleBuddy.RefreshPinLayout()
     LMP:RefreshPins(ScuttleBuddy.ScuttleBuddy_map_pin)
     CCP:AddCustomPin(ScuttleBuddy.custom_compass_pin, compass_callback, pinlayout_compass)
@@ -502,11 +485,7 @@ EVENT_MANAGER:RegisterForEvent(ScuttleBuddy.addon_name.."_InitPins", EVENT_PLAYE
 
 function ScuttleBuddy.update_active_locations()
     ScuttleBuddy.dm("Debug", "update_active_locations")
-    ScuttleBuddy_SavedVars.custom_compass_pin = true
-    -- also enable map pins
-    ScuttleBuddy_SavedVars.ScuttleBuddy_map_pin = true
 
-    LMP:Enable(ScuttleBuddy.ScuttleBuddy_map_pin)
     LMP:RefreshPins(ScuttleBuddy.ScuttleBuddy_map_pin)
     CCP:RefreshPins(ScuttleBuddy.custom_compass_pin)
     --[[
@@ -533,13 +512,14 @@ local function purge_duplicate_data()
             end
         else
             ScuttleBuddy.dm("Debug", "ScuttleBuddy nothing to loop over")
-            ScuttleBuddy_SavedVars.location_info[zone] = all_savedvariables_data[zone]
+            ScuttleBuddy_SavedVars.location_info[zone] = all_savedvariables_data[zone] or {}
         end
     end
 end
 
 local function OnLoad(eventCode, addOnName)
     if addOnName ~= ScuttleBuddy.addon_name then return end
+    --[[
     -- turn the top level control into a 3d control
     ScuttleBuddy_WorldPins:Create3DRenderSpace()
 
@@ -549,11 +529,12 @@ local function OnLoad(eventCode, addOnName)
     HUD_UI_SCENE:AddFragment(fragment)
     HUD_SCENE:AddFragment(fragment)
     LOOT_SCENE:AddFragment(fragment)
+    ]]--
 
     -- register a callback, so we know when to start/stop displaying the ScuttleBuddy.dig_site_pin
     Lib3D:RegisterWorldChangeCallback("DigSite", function(identifier, zoneIndex, isValidZone, newZone)
         if not newZone then return end
-        
+
         --[[
             ScuttleBuddy.Draw3DPins()
         else
@@ -589,22 +570,15 @@ local function OnLoad(eventCode, addOnName)
         end
     end
 
-    if ScuttleBuddy_SavedVars["location_info"]["eyevea_base_0"] then
-        ScuttleBuddy_SavedVars["location_info"]["guildmaps/eyevea_base_0"] = ScuttleBuddy_SavedVars["location_info"]["eyevea_base_0"]
-        ScuttleBuddy_SavedVars["location_info"]["eyevea_base_0"] = nil
-    end
     purge_duplicate_data()
-
     InitializePins()
     ScuttleBuddy.update_active_locations()
 
-    --SLASH_COMMANDS["/ssreset"] = function() reset_zone_data() end
+    --SLASH_COMMANDS["/sbreset"] = function() reset_zone_data() end
 
-    --SLASH_COMMANDS["/ssbuild"] = function() build_zone_data() end
+    --SLASH_COMMANDS["/sbbuild"] = function() build_zone_data() end
 
-    --SLASH_COMMANDS["/ssbuildall"] = function() build_all_zone_data() end
-
-    SLASH_COMMANDS["/ssrefresh"] = function() ScuttleBuddy.update_antiquity_locations() end
+    --SLASH_COMMANDS["/sbbuildall"] = function() build_all_zone_data() end
 
 	EVENT_MANAGER:UnregisterForEvent(ScuttleBuddy.addon_name, EVENT_ADD_ON_LOADED)
 end
