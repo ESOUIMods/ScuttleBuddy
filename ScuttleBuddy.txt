@@ -1,11 +1,11 @@
 ## Title: ScuttleBuddy
 ## Description: Adds Scuttlebloom locations to the map
 ## Author: Sharlikran
-## Version: 1.05
-## AddOnVersion: 105
-## APIVersion: 100031
+## Version: 1.06
+## AddOnVersion: 106
+## APIVersion: 100033 100034
 ## SavedVariables: ScuttleBuddy_SavedVars
-## DependsOn: CustomCompassPins>=31 LibMapPins-1.0>=10027 LibGPS>=37 Lib3D>=312 LibAddonMenu-2.0>=30
+## DependsOn: CustomCompassPins>=31 LibMapPins-1.0>=10029 LibGPS>=37 Lib3D>=312 LibAddonMenu-2.0>=32
 ## OptionalDependsOn: LibDebugLogger>=196 DebugLogViewer
 
 ; DISCLAIMER:
