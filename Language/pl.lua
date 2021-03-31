@@ -1,3 +1,4 @@
+--[[
 local strings = {
     mod_title                           = "ScuttleBuddy",
     map_pin_texture_text                = "Select map pin icons",
@@ -19,3 +20,4 @@ local strings = {
 for stringId, stringValue in pairs(strings) do
     SafeAddString(_G[stringId], stringValue, 1)
 end
+]]--

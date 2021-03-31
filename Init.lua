@@ -1,5 +1,37 @@
 ScuttleBuddy = {}
 
+-------------------------------------------------
+----- early helper                          -----
+-------------------------------------------------
+
+local function is_in(search_value, search_table)
+    for k, v in pairs(search_table) do
+        if search_value == v then return true end
+        if type(search_value) == "string" then
+            if string.find(string.lower(v), string.lower(search_value)) then return true end
+        end
+    end
+    return false
+end
+
+-------------------------------------------------
+----- lang setup                            -----
+-------------------------------------------------
+
+ScuttleBuddy.client_lang = GetCVar("language.2")
+ScuttleBuddy.effective_lang = nil
+ScuttleBuddy.supported_lang = { "de", "en", "es", "fr", "pl", "ru", }
+if is_in(ScuttleBuddy.client_lang, ScuttleBuddy.supported_lang) then
+  ScuttleBuddy.effective_lang = ScuttleBuddy.client_lang
+else
+  ScuttleBuddy.effective_lang = "en"
+end
+ScuttleBuddy.supported_lang = ScuttleBuddy.client_lang == ScuttleBuddy.effective_lang
+
+-------------------------------------------------
+----- mod                                   -----
+-------------------------------------------------
+
 --[[
 Some settings moved to Init.lua to make them global to other files
 ]]--
@@ -13,12 +45,11 @@ ScuttleBuddy_defaults = {
 ScuttleBuddy_SavedVars.show_pins
 ]]--
 ScuttleBuddy.addon_name = "ScuttleBuddy"
-ScuttleBuddy.addon_version = "1.05"
+ScuttleBuddy.addon_version = "1.07"
 ScuttleBuddy.addon_website = "https://www.esoui.com/downloads/info2647-ScuttleBuddy.html"
 ScuttleBuddy.custom_compass_pin = "ScuttleBuddy_compass_pin" -- custom compas pin pin type
 ScuttleBuddy.ScuttleBuddy_map_pin = "ScuttleBuddy_map_pin"
 ScuttleBuddy.dig_site_pin = "ScuttleBuddy_location_pin"
-ScuttleBuddy.client_lang = GetCVar("language.2")
 ScuttleBuddy.should_update_digsites = true
 
 ScuttleBuddy.pin_textures = {

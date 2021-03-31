@@ -67,7 +67,7 @@ function ScuttleBuddy.dm(log_type, ...)
 end
 
 ---------------------------------------
------ ScuttleBuddy Vars                -----
+----- ScuttleBuddy Vars           -----
 ---------------------------------------
 
 ScuttleBuddy_SavedVars = ScuttleBuddy_SavedVars or { }
@@ -89,10 +89,12 @@ local PIN_NAME = "Scuttle Bloom"
 
 -- ScuttleBuddy
 ScuttleBuddy.dig_site_names = {
-    ["en"] = "Scuttle Bloom",
-    ["ru"] = "Скатловый цветок",
     ["de"] = "Krabbelblüte",
+    ["en"] = "Scuttle Bloom",
+    ["es"] = "flor trotadora",
     ["fr"] = "fleur trotteuse",
+    ["pl"] = "Umykaczka",
+    ["ru"] = "Скатловый цветок",
 }
 
 ScuttleBuddy.loc_index = {
@@ -147,7 +149,7 @@ local function get_digsite_locations(zone)
 end
 
 ---------------------------------------
------ ScuttleBuddy                     -----
+----- ScuttleBuddy                -----
 ---------------------------------------
 --ScuttleBuddy.worldControlPool = ZO_ControlPool:New("ScuttleBuddy_WorldPin", ScuttleBuddy_WorldPins)
 
@@ -305,7 +307,7 @@ local function OnInteract(event_code, client_interact_result, interact_target_na
     local text = zo_strformat(SI_CHAT_MESSAGE_FORMATTER, interact_target_name)
     ScuttleBuddy.dm("Debug", text)
     ScuttleBuddy.dm("Debug", "OnInteract")
-    if text == ScuttleBuddy.dig_site_names[ScuttleBuddy.client_lang] then
+    if text == ScuttleBuddy.dig_site_names[ScuttleBuddy.effective_lang] then
         ScuttleBuddy.dm("Debug", "ScuttleBuddy.dig_site_names")
         save_dig_site_location()
     end
