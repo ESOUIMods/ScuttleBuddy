@@ -18,7 +18,7 @@ end
 ----- lang setup                            -----
 -------------------------------------------------
 
-ScuttleBuddy.client_lang = GetCVar("language.2")
+ScuttleBuddy.client_lang = GetCVar("Language.2")
 ScuttleBuddy.effective_lang = nil
 ScuttleBuddy.supported_lang = { "de", "en", "es", "fr", "pl", "ru", }
 if is_in(ScuttleBuddy.client_lang, ScuttleBuddy.supported_lang) then
