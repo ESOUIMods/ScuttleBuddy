@@ -45,7 +45,7 @@ ScuttleBuddy_defaults = {
 ScuttleBuddy_SavedVars.show_pins
 ]]--
 ScuttleBuddy.addon_name = "ScuttleBuddy"
-ScuttleBuddy.addon_version = "1.07"
+ScuttleBuddy.addon_version = "1.08"
 ScuttleBuddy.addon_website = "https://www.esoui.com/downloads/info2647-ScuttleBuddy.html"
 ScuttleBuddy.custom_compass_pin = "ScuttleBuddy_compass_pin" -- custom compas pin pin type
 ScuttleBuddy.ScuttleBuddy_map_pin = "ScuttleBuddy_map_pin"
