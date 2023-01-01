@@ -1,30 +1,36 @@
 local LMP = LibMapPins
 local GPS = LibGPS3
-local Lib3D = Lib3D
 local CCP = COMPASS_PINS
 local LAM = LibAddonMenu2
 
----------------------------------------
------ Degub Logging               -----
----------------------------------------
-
-if LibDebugLogger then
-  local logger = LibDebugLogger.Create(ScuttleBuddy.addon_name)
-  ScuttleBuddy.logger = logger
-end
+-------------------------------------------------
+----- Logger Function                       -----
+-------------------------------------------------
 ScuttleBuddy.show_log = false
-local SDLV = DebugLogViewer
+if LibDebugLogger then
+  ScuttleBuddy.logger = LibDebugLogger.Create(ScuttleBuddy.addon_name)
+end
+local logger
+local viewer
+if DebugLogViewer then viewer = true else viewer = false end
+if LibDebugLogger then logger = true else logger = false end
 
 local function create_log(log_type, log_content)
-  if ScuttleBuddy.show_log and ScuttleBuddy.logger and SDLV then
-    if log_type == "Debug" then
-      ScuttleBuddy.logger:Debug(log_content)
-    end
-    if log_type == "Verbose" then
-      ScuttleBuddy.logger:Verbose(log_content)
-    end
-  elseif ScuttleBuddy.show_log and not SDLV then
-    d(log_content)
+  if not viewer and log_type == "Info" then
+    CHAT_ROUTER:AddSystemMessage(log_content)
+    return
+  end
+  if logger and log_type == "Debug" then
+    ScuttleBuddy.logger:Debug(log_content)
+  end
+  if logger and log_type == "Info" then
+    ScuttleBuddy.logger:Info(log_content)
+  end
+  if logger and log_type == "Verbose" then
+    ScuttleBuddy.logger:Verbose(log_content)
+  end
+  if logger and log_type == "Warn" then
+    ScuttleBuddy.logger:Warn(log_content)
   end
 end
 
@@ -55,7 +61,8 @@ local function emit_table(log_type, t, indent, table_history)
   end
 end
 
-function ScuttleBuddy.dm(log_type, ...)
+function ScuttleBuddy:dm(log_type, ...)
+  if not ScuttleBuddy.show_log then return end
   for i = 1, select("#", ...) do
     local value = select(i, ...)
     if (type(value) == "table") then
@@ -152,8 +159,6 @@ end
 ---------------------------------------
 ----- ScuttleBuddy                -----
 ---------------------------------------
---ScuttleBuddy.worldControlPool = ZO_ControlPool:New("ScuttleBuddy_WorldPin", ScuttleBuddy_WorldPins)
-
 local function get_digsite_loc_sv(zone)
   ScuttleBuddy.dm("Debug", zone)
   if is_empty_or_nil(ScuttleBuddy_SavedVars.location_info[zone]) then
@@ -231,76 +236,6 @@ function ScuttleBuddy.RefreshPinLayout()
   LMP:SetLayoutKey(ScuttleBuddy.ScuttleBuddy_map_pin, "level", ScuttleBuddy_SavedVars.pin_level)
   LMP:SetLayoutKey(ScuttleBuddy.ScuttleBuddy_map_pin, "texture", ScuttleBuddy.pin_textures[ScuttleBuddy_SavedVars.pin_type])
 end
-
----------------------------------------
------ Lib3D                       -----
----------------------------------------
---[[
-function ScuttleBuddy.Hide3DPins()
-    -- remove the on update handler and hide the ScuttleBuddy.dig_site_pin
-    EVENT_MANAGER:UnregisterForUpdate("DigSite")
-    ScuttleBuddy_WorldPins:SetHidden(true)
-    ScuttleBuddy.worldControlPool:ReleaseAllObjects()
-end
-]]--
-
---[[
-function ScuttleBuddy.Draw3DPins()
-    EVENT_MANAGER:UnregisterForUpdate("DigSite")
-
-    local zone = LMP:GetZoneAndSubzone(true, false, true)
-
-    local mapData = ScuttleBuddy.get_pin_data(zone) or { }
-    -- pseudo_pin_location
-    if mapData then
-        local worldX, worldZ, worldY = WorldPositionToGuiRender3DPosition(0,0,0)
-        if not worldX then return end
-        ScuttleBuddy_WorldPins:Set3DRenderSpaceOrigin(worldX, worldZ, worldY)
-        ScuttleBuddy_WorldPins:SetHidden(false)
-
-        for pin, pinData in ipairs(mapData) do
-            local pinControl = ScuttleBuddy.worldControlPool:AcquireObject(pin)
-            if not pinControl:Has3DRenderSpace() then
-                pinControl:Create3DRenderSpace()
-            end
-
-            local size = 1
-            local iconControl = pinControl:GetNamedChild("Icon")
-            if not iconControl:Has3DRenderSpace() then
-                iconControl:Create3DRenderSpace()
-                iconControl:Set3DRenderSpaceUsesDepthBuffer(true)
-            end
-            iconControl:SetTexture(ScuttleBuddy.pin_textures[ScuttleBuddy_SavedVars.digsite_pin_type])
-            iconControl:Set3DRenderSpaceOrigin(pinData[ScuttleBuddy.loc_index.worldX]/100, (pinData[ScuttleBuddy.loc_index.worldY]/100) + 2.5, pinData[ScuttleBuddy.loc_index.worldZ]/100)
-            iconControl:Set3DLocalDimensions(0.30 * size + 0.6, 0.30 * size + 0.6)
-
-            local spikeControl = pinControl:GetNamedChild("Spike")
-            if not spikeControl:Has3DRenderSpace() then
-                spikeControl:Create3DRenderSpace()
-                spikeControl:Set3DRenderSpaceUsesDepthBuffer(true)
-            end
-            spikeControl:SetColor(ScuttleBuddy.unpack_color_table(ScuttleBuddy_SavedVars.digsite_spike_color))
-            spikeControl:Set3DRenderSpaceOrigin(pinData[ScuttleBuddy.loc_index.worldX]/100, (pinData[ScuttleBuddy.loc_index.worldY]/100) + 1.0, pinData[ScuttleBuddy.loc_index.worldZ]/100)
-            spikeControl:Set3DLocalDimensions(0.25 * size + 0.75, 0.75 * size + 1.25)
-        end
-
-        local activeObjects = ScuttleBuddy.worldControlPool:GetActiveObjects()
-
-        -- don't do that every single frame. it's not necessary
-        EVENT_MANAGER:RegisterForUpdate("DigSite", 100, function()
-            local x, y, z, forwardX, forwardY, forwardZ, rightX, rightY, rightZ, upX, upY, upZ = Lib3D:GetCameraRenderSpace()
-            for key, pinControl in pairs(activeObjects) do
-                for i = 1, pinControl:GetNumChildren() do
-                    local textureControl = pinControl:GetChild(i)
-                    textureControl:Set3DRenderSpaceForward(forwardX, forwardY, forwardZ)
-                    textureControl:Set3DRenderSpaceRight(rightX, rightY, rightZ)
-                    textureControl:Set3DRenderSpaceUp(upX, upY, upZ)
-                end
-            end
-        end)
-    end
-end
-]]--
 
 local function OnInteract(event_code, client_interact_result, interact_target_name)
   ScuttleBuddy.dm("Debug", "OnInteract Occured")
@@ -521,6 +456,7 @@ end
 
 local function OnLoad(eventCode, addOnName)
   if addOnName ~= ScuttleBuddy.addon_name then return end
+  ScuttleBuddy:dm("Debug", "OnAddOnLoaded")
   --[[
   -- turn the top level control into a 3d control
   ScuttleBuddy_WorldPins:Create3DRenderSpace()
@@ -532,18 +468,6 @@ local function OnLoad(eventCode, addOnName)
   HUD_SCENE:AddFragment(fragment)
   LOOT_SCENE:AddFragment(fragment)
   ]]--
-
-  -- register a callback, so we know when to start/stop displaying the ScuttleBuddy.dig_site_pin
-  Lib3D:RegisterWorldChangeCallback("DigSite", function(identifier, zoneIndex, isValidZone, newZone)
-    if not newZone then return end
-
-    --[[
-        ScuttleBuddy.Draw3DPins()
-    else
-        ScuttleBuddy.Hide3DPins()
-    end
-    ]]--
-  end)
 
   if ScuttleBuddy_SavedVars.version ~= 4 then
     local temp_locations
