@@ -4,27 +4,34 @@ local Lib3D = Lib3D
 local CCP = COMPASS_PINS
 local LAM = LibAddonMenu2
 
----------------------------------------
------ Degub Logging               -----
----------------------------------------
-
-if LibDebugLogger then
-  local logger = LibDebugLogger.Create(ScuttleBuddy.addon_name)
-  ScuttleBuddy.logger = logger
-end
+-------------------------------------------------
+----- Logger Function                       -----
+-------------------------------------------------
 ScuttleBuddy.show_log = false
-local SDLV = DebugLogViewer
+if LibDebugLogger then
+  ScuttleBuddy.logger = LibDebugLogger.Create(ScuttleBuddy.addon_name)
+end
+local logger
+local viewer
+if DebugLogViewer then viewer = true else viewer = false end
+if LibDebugLogger then logger = true else logger = false end
 
 local function create_log(log_type, log_content)
-  if ScuttleBuddy.show_log and ScuttleBuddy.logger and SDLV then
-    if log_type == "Debug" then
-      ScuttleBuddy.logger:Debug(log_content)
-    end
-    if log_type == "Verbose" then
-      ScuttleBuddy.logger:Verbose(log_content)
-    end
-  elseif ScuttleBuddy.show_log and not SDLV then
-    d(log_content)
+  if not viewer and log_type == "Info" then
+    CHAT_ROUTER:AddSystemMessage(log_content)
+    return
+  end
+  if logger and log_type == "Debug" then
+    ScuttleBuddy.logger:Debug(log_content)
+  end
+  if logger and log_type == "Info" then
+    ScuttleBuddy.logger:Info(log_content)
+  end
+  if logger and log_type == "Verbose" then
+    ScuttleBuddy.logger:Verbose(log_content)
+  end
+  if logger and log_type == "Warn" then
+    ScuttleBuddy.logger:Warn(log_content)
   end
 end
 
@@ -55,7 +62,8 @@ local function emit_table(log_type, t, indent, table_history)
   end
 end
 
-function ScuttleBuddy.dm(log_type, ...)
+function ScuttleBuddy:dm(log_type, ...)
+  if not ScuttleBuddy.show_log then return end
   for i = 1, select("#", ...) do
     local value = select(i, ...)
     if (type(value) == "table") then
