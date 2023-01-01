@@ -5,7 +5,7 @@
 ## AddOnVersion: 111
 ## APIVersion: 101035 101036
 ## SavedVariables: ScuttleBuddy_SavedVars
-## DependsOn: CustomCompassPins>=32 LibMapPins-1.0>=10038 LibGPS>=68 Lib3D>=312 LibAddonMenu-2.0>=33
+## DependsOn: CustomCompassPins>=32 LibMapPins-1.0>=10038 LibGPS>=68 LibAddonMenu-2.0>=33
 ## OptionalDependsOn: LibDebugLogger>=196 DebugLogViewer
 
 ; DISCLAIMER:
