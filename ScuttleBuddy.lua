@@ -1,7 +1,7 @@
 local LMP = LibMapPins
 local GPS = LibGPS3
 local CCP = COMPASS_PINS
-local LAM = LibAddonMenu2
+local LMD = LibMapData
 
 -------------------------------------------------
 ----- Logger Function                       -----
@@ -159,6 +159,13 @@ end
 ---------------------------------------
 ----- ScuttleBuddy                -----
 ---------------------------------------
+local function CheckMapStatus()
+  local correctMapType = GetMapType() <= MAPTYPE_ZONE
+  local correctMapTexture = LMD.mapTexture == "murkmire/murkmire_base_0" or LMD.mapTexture ==  "murkmire/deadwatervillage_base_0"
+  if correctMapType and correctMapTexture then return true
+  else return false end
+end
+
 local function get_digsite_loc_sv(zone)
   ScuttleBuddy.dm("Debug", zone)
   if is_empty_or_nil(ScuttleBuddy_SavedVars.location_info[zone]) then
@@ -268,6 +275,9 @@ function ScuttleBuddy.combine_data(zone)
 end
 
 function ScuttleBuddy.get_pin_data(zone)
+ -- don't load the data if it's not murkmire
+  if not CheckMapStatus() then return end
+
   local function in_mod_digsite_pool(main_table, location)
     for _, compas_pin_loc in pairs(main_table) do
       local distance = zo_round(GPS:GetLocalDistanceInMeters(compas_pin_loc[ScuttleBuddy.loc_index.x_pos], compas_pin_loc[ScuttleBuddy.loc_index.y_pos], location[ScuttleBuddy.loc_index.x_pos], location[ScuttleBuddy.loc_index.y_pos]))
@@ -305,16 +315,10 @@ local function InitializePins()
     ]]--
     --d(zone)
     local mapData = ScuttleBuddy.get_pin_data(zone) or { }
-    if mapData then
+    if mapData and LMP:IsEnabled(pinType) then
       for index, pinData in pairs(mapData) do
         LMP:CreatePin(ScuttleBuddy.ScuttleBuddy_map_pin, pinData, pinData[ScuttleBuddy.loc_index.x_pos], pinData[ScuttleBuddy.loc_index.y_pos])
       end
-    end
-  end
-
-  local function PinTypeAddCallback(pinType)
-    if GetMapType() <= MAPTYPE_ZONE and LMP:IsEnabled(pinType) then
-      MapPinAddCallback(pinType)
     end
   end
 
@@ -337,7 +341,7 @@ local function InitializePins()
   }
 
   local function compass_callback()
-    if GetMapType() <= MAPTYPE_ZONE and ScuttleBuddy_SavedVars.custom_compass_pin then
+    if ScuttleBuddy_SavedVars.custom_compass_pin then
       local zone = LMP:GetZoneAndSubzone(true, false, true)
       local mapData = ScuttleBuddy.get_pin_data(zone) or { }
       if mapData then
@@ -361,7 +365,7 @@ local function InitializePins()
     end
   }
 
-  LMP:AddPinType(ScuttleBuddy.ScuttleBuddy_map_pin, function() PinTypeAddCallback(ScuttleBuddy.ScuttleBuddy_map_pin) end, nil, lmp_pin_layout, pinTooltipCreator)
+  LMP:AddPinType(ScuttleBuddy.ScuttleBuddy_map_pin, function() MapPinAddCallback(ScuttleBuddy.ScuttleBuddy_map_pin) end, nil, lmp_pin_layout, pinTooltipCreator)
   LMP:AddPinFilter(ScuttleBuddy.ScuttleBuddy_map_pin, zo_iconFormat(ScuttleBuddy.pin_textures[1], 24, 24) .. " " .. PIN_NAME, false, ScuttleBuddy_SavedVars, "ScuttleBuddy_map_pin")
   LMP:SetPinFilterHidden(ScuttleBuddy.ScuttleBuddy_map_pin, "pvp", true)
   LMP:SetPinFilterHidden(ScuttleBuddy.ScuttleBuddy_map_pin, "imperialPvP", true)
