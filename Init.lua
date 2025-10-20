@@ -4,14 +4,20 @@ ScuttleBuddy = {}
 ----- early helper                          -----
 -------------------------------------------------
 
+local function is_empty_or_nil(t)
+  if t == nil or t == "" then return true end
+  return type(t) == "table" and ZO_IsTableEmpty(t) or false
+end
+
 local function is_in(search_value, search_table)
-  for k, v in pairs(search_table) do
-    if search_value == v then return true end
-    if type(search_value) == "string" then
-      if string.find(string.lower(v), string.lower(search_value)) then return true end
+    if is_empty_or_nil(search_value) then return false end
+    for k, v in pairs(search_table) do
+        if search_value == v then return true end
+        if type(search_value) == "string" then
+            if string.find(string.lower(v), string.lower(search_value)) then return true end
+        end
     end
-  end
-  return false
+    return false
 end
 
 -------------------------------------------------
@@ -45,7 +51,7 @@ ScuttleBuddy_defaults = {
 ScuttleBuddy_SavedVars.show_pins
 ]]--
 ScuttleBuddy.addon_name = "ScuttleBuddy"
-ScuttleBuddy.addon_version = "1.13"
+ScuttleBuddy.addon_version = "1.14"
 ScuttleBuddy.addon_website = "https://www.esoui.com/downloads/info2647-ScuttleBuddy.html"
 ScuttleBuddy.custom_compass_pin = "ScuttleBuddy_compass_pin" -- custom compas pin pin type
 ScuttleBuddy.ScuttleBuddy_map_pin = "ScuttleBuddy_map_pin"

@@ -115,36 +115,21 @@ ScuttleBuddy.loc_index = {
   worldZ = 7,
 }
 
-local function is_in(search_value, search_table)
-  for k, v in pairs(search_table) do
-    if search_value == v then return true end
-    if type(search_value) == "string" then
-      if string.find(string.lower(v), string.lower(search_value)) then return true end
-    end
-  end
-  return false
-end
-
 -- Function to check for empty table
 local function is_empty_or_nil(t)
-  if not t then return true end
-  if type(t) == "table" then
-    if next(t) == nil then
-      return true
-    else
-      return false
+  if t == nil or t == "" then return true end
+  return type(t) == "table" and ZO_IsTableEmpty(t) or false
+end
+
+local function is_in(search_value, search_table)
+    if is_empty_or_nil(search_value) then return false end
+    for k, v in pairs(search_table) do
+        if search_value == v then return true end
+        if type(search_value) == "string" then
+            if string.find(string.lower(v), string.lower(search_value)) then return true end
+        end
     end
-  elseif type(t) == "string" then
-    if t == nil then
-      return true
-    elseif t == "" then
-      return true
-    else
-      return false
-    end
-  elseif type(t) == "nil" then
-    return true
-  end
+    return false
 end
 
 local function get_digsite_locations(zone)
@@ -372,7 +357,7 @@ local function InitializePins()
   LMP:SetPinFilterHidden(ScuttleBuddy.ScuttleBuddy_map_pin, "battleground", true)
   ScuttleBuddy.RefreshPinLayout()
   LMP:RefreshPins(ScuttleBuddy.ScuttleBuddy_map_pin)
-  CCP:AddCustomPin(ScuttleBuddy.custom_compass_pin, compass_callback, pinlayout_compass)
+  CCP:AddCustomPin(ScuttleBuddy.custom_compass_pin, compass_callback, pinlayout_compass, ScuttleBuddy_SavedVars)
   CCP:RefreshPins(ScuttleBuddy.custom_compass_pin)
 end
 
