@@ -7,7 +7,7 @@
 ## SavedVariables: ScuttleBuddy_SavedVars
 ## DependsOn: CustomCompassPins>=137 LibMapPins-1.0>=10045 LibGPS>=73 LibAddonMenu-2.0>=40
 ## DependsOn: LibMapData>=117
-## OptionalDependsOn: LibDebugLogger>=268 DebugLogViewer
+## OptionalDependsOn: LibDebugLogger DebugLogViewer
 
 ; DISCLAIMER:
 ;
